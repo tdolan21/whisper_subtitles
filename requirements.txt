@@ -1,0 +1,12 @@
+librosa
+soundfile
+torch
+torchaudio
+torchvision        
+transformers
+pyannote.audio
+colorama
+optimum
+python-dotenv
+python-multipart
+moviepy
