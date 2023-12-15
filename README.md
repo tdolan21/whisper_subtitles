@@ -4,7 +4,14 @@ Whisper Subtitles is an audio processing tool capable of transcribing and perfor
 
 ![header.png](files/header.png)
 
-![PyTorch](https://img.shields.io/badge/PyTorch-red.svg) ![Hugging Face](https://img.shields.io/badge/Hugging_Face-orange.svg) ![librosa](https://img.shields.io/badge/librosa-yellowgreen.svg) ![Python](https://img.shields.io/badge/Python-3776AB.svg?&logo=python&logoColor=white) ![Argparse](https://img.shields.io/badge/Argparse-007ACC.svg?&logo=gnu-bash&logoColor=white) ![Colorama](https://img.shields.io/badge/Colorama-FFD43B.svg?&logo=python&logoColor=blue)
+![PyTorch](https://img.shields.io/badge/PyTorch-red.svg) ![Hugging Face](https://img.shields.io/badge/Hugging_Face-orange.svg) ![librosa](https://img.shields.io/badge/librosa-yellowgreen.svg) ![Python](https://img.shields.io/badge/Python-3776AB.svg?&logo=python&logoColor=white) ![Argparse](https://img.shields.io/badge/Argparse-007ACC.svg?&logo=gnu-bash&logoColor=white) !
+
+## Optimizations
+
++ Speculative Decoding using distil-whisper as the draft model
++ Low VRAM machines benefit from the inclusion of optimum and bettertransformers.
++ Machines with 3090+ utilize [flash attention 2](https://github.com/Dao-AILab/flash-attention)
++ Pyannote utilized with pytorch lightning. Segmenting takes only 58 seconds for a 30 minute file.
 
 
 ## Prerequisites
@@ -20,10 +27,17 @@ You must have docker with GPU access enabled.
 Install in editable mode:
 
 ```bash
-git clone https://github.com/tdolan21/subtitle-cli
-cd subtitle-cli
+git clone https://github.com/tdolan21/whisper_subtitles
+cd whisper_subtitles
 ```
 Copy the .env.example and make .env file with your Huggingface Hub access token in it.
+
+```bash
+HUGGINGFACE_HUB_TOKEN=your_auth_token
+```
+
+Once you have added your auth token you can install with pip:
+
 
 ```bash
 pip install -e .
@@ -90,6 +104,22 @@ whisper-subtitles /path/to/audiofile --max_new_tokens 512 --chunk_length_s 20 --
 
 In this example, the tool transcribes audio with a maximum of 512 new tokens, chunk length of 20 seconds, batch size of 16, sets the transcription language to Spanish (es), and translates the output.
 
+## Utility Features
+
+Easily verify that youre GPU can be utilized properly.
+
+![GPU-stats](files/gpu_information.png)
+
+## Performance Test Results
+
+| Whisper Model                  | 2m 30s | 30 min | 90 min |
+|--------------------------------|--------|--------|--------|
+| openai/whisper-large-v3        | 130s   | TBD    | TBD    |
+| openai/whisper-large-v2        | TBD    | TBD    | TBD    |
+| distil-whisper/distil-large-v2 | TBD    | TBD    | TBD    |
+| distil-whisper/distil-large    | TBD    | TBD    | TBD    |
+| distil-whisper/distil-medium.en| TBD    | TBD    | TBD    |
+| distil-whisper/distil-small.en | TBD    | TBD    | TBD    |
 
 ## Example output
 
@@ -124,3 +154,46 @@ SPEAKER_00:  and took a great deal of time and effort to construct,
 8
 00:00:06,000 --> 00:00:08,679
 SPEAKER_00:  as well as a fair degree of engineering expertise.
+
+## Citations
+
+```bibtex
+@inproceedings{Plaquet23,
+  author={Alexis Plaquet and Hervé Bredin},
+  title={{Powerset multi-class cross entropy loss for neural speaker diarization}},
+  year=2023,
+  booktitle={Proc. INTERSPEECH 2023},
+}
+```
+
+```bibtex
+@inproceedings{Bredin23,
+  author={Hervé Bredin},
+  title={{pyannote.audio 2.1 speaker diarization pipeline: principle, benchmark, and recipe}},
+  year=2023,
+  booktitle={Proc. INTERSPEECH 2023},
+}
+```
+
+```bibtex
+@misc{gandhi2023distilwhisper,
+      title={Distil-Whisper: Robust Knowledge Distillation via Large-Scale Pseudo Labelling}, 
+      author={Sanchit Gandhi and Patrick von Platen and Alexander M. Rush},
+      year={2023},
+      eprint={2311.00430},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL}
+}
+```
+
+```bibtex
+@misc{radford2022whisper,
+  doi = {10.48550/ARXIV.2212.04356},
+  url = {https://arxiv.org/abs/2212.04356},
+  author = {Radford, Alec and Kim, Jong Wook and Xu, Tao and Brockman, Greg and McLeavey, Christine and Sutskever, Ilya},
+  title = {Robust Speech Recognition via Large-Scale Weak Supervision},
+  publisher = {arXiv},
+  year = {2022},
+  copyright = {arXiv.org perpetual, non-exclusive license}
+}
+```
