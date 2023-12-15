@@ -4,7 +4,7 @@ Whisper Subtitles is an audio processing tool capable of transcribing and perfor
 
 ![header.png](files/header.png)
 
-![PyTorch](https://img.shields.io/badge/PyTorch-red.svg) ![Hugging Face](https://img.shields.io/badge/Hugging_Face-orange.svg) ![librosa](https://img.shields.io/badge/librosa-yellowgreen.svg) ![Python](https://img.shields.io/badge/Python-3776AB.svg?&logo=python&logoColor=white) ![Argparse](https://img.shields.io/badge/Argparse-007ACC.svg?&logo=gnu-bash&logoColor=white) !
+![PyTorch](https://img.shields.io/badge/PyTorch-red.svg) ![Hugging Face](https://img.shields.io/badge/Hugging_Face-orange.svg) ![librosa](https://img.shields.io/badge/librosa-yellowgreen.svg) ![Python](https://img.shields.io/badge/Python-3776AB.svg?&logo=python&logoColor=white) ![Argparse](https://img.shields.io/badge/Argparse-007ACC.svg?&logo=gnu-bash&logoColor=white) ![Colorama](https://img.shields.io/badge/Colorama-FFD43B.svg?&logo=python&logoColor=blue)
 
 ## Optimizations
 
@@ -13,8 +13,10 @@ Whisper Subtitles is an audio processing tool capable of transcribing and perfor
 + Machines with 3090+ utilize [flash attention 2](https://github.com/Dao-AILab/flash-attention)
 + Pyannote utilized with pytorch lightning. Segmenting takes only 58 seconds for a 30 minute file.
 
-
 ## Prerequisites
+
+Python 3.8-3.11 has been tested. 
+Python 3.8 is recommended for fastest response times with flash attention 2
 
 You must have docker with GPU access enabled.
 
@@ -27,7 +29,7 @@ You must have docker with GPU access enabled.
 Install in editable mode:
 
 ```bash
-git clone https://github.com/tdolan21/whisper_subtitles
+git clone https://github.com/tdolan21/whisper_subtitles.git
 cd whisper_subtitles
 ```
 Copy the .env.example and make .env file with your Huggingface Hub access token in it.
@@ -38,12 +40,13 @@ HUGGINGFACE_HUB_TOKEN=your_auth_token
 
 Once you have added your auth token you can install with pip:
 
-
 ```bash
 pip install -e .
 ```
 
 ## Usage
+
+![usage-screenshot](files/usage.png)
 
 To use whisper-subtitles, you have several command options to customize the transcription and diarization process. Here are some example usages:
 
@@ -120,6 +123,7 @@ Easily verify that youre GPU can be utilized properly.
 | distil-whisper/distil-large    | TBD    | TBD    | TBD    |
 | distil-whisper/distil-medium.en| TBD    | TBD    | TBD    |
 | distil-whisper/distil-small.en | TBD    | TBD    | TBD    |
+
 
 ## Example output
 
