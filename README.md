@@ -18,7 +18,6 @@ Whisper Subtitles is an audio processing tool capable of transcribing and perfor
 Python 3.8-3.11 has been tested. 
 Python 3.8 is recommended for fastest response times with flash attention 2
 
-You must have docker with GPU access enabled.
 
 + Accept [pyannote/segmentation-3.0](https://hf.co/pyannote/segmentation-3.0) user conditions
 + Accept [pyannote/speaker-diarization-3.1](https://hf.co/pyannote-speaker-diarization-3.1)user conditions
@@ -83,18 +82,9 @@ You can also specify the language for transcription and enable translation:
 + Specifying Language:
 
 ```bash
-whisper-subtitles /path/to/audiofile --language en
+whisper-subtitles /path/to/audiofile --language en --translate
 ```
 
-This sets the anticipated language for transcription to English (en). Replace en with the desired language code as needed.
-
-This does not guaruntee that the language will be correct, it just provides a starting point for the model.
-
-+ Enabling Translation:
-
-```bash
-whisper-subtitles /path/to/audiofile --translate
-```
 This command enables translation of the transcribed text.
 
 + Combining Options
@@ -102,14 +92,32 @@ This command enables translation of the transcribed text.
 You can combine multiple options for finer control:
 
 ```bash
-whisper-subtitles /path/to/audiofile --max_new_tokens 512 --chunk_length_s 20 --batch_size 16 --language es --translate
+whisper-subtitles /path/to/audiofile --max_new_tokens 512 --chunk_length_s 20 --batch_size 16 --language en --translate
 ```
 
-In this example, the tool transcribes audio with a maximum of 512 new tokens, chunk length of 20 seconds, batch size of 16, sets the transcription language to Spanish (es), and translates the output.
+In this example, the tool transcribes audio with a maximum of 512 new tokens, chunk length of 20 seconds, batch size of 16, sets the translation from Spanish (es) to English (en).
+
+## Speculative Decoding
+
+To initiate the assistant model simply add the flag `--assistant_model_id`.
+
+```bash
+whisper-subtitles /path/to/audiofile --model_id openai/whisper-large-v2 --max_new_tokens 512 --chunk_length_s 20 --batch_size 16 --assistant_model_id distil-whisper/distil-large-v2
+```
+If you have less system memory or VRAM to work with you can also utilize this feature by using smaller models.
+
+```bash
+whisper-subtitles /path/to/audiofile --model_id openai/whisper-large-v2 --max_new_tokens 512 --chunk_length_s 20 --batch_size 16 --assistant_model_id distil-whisper/distil-large-v2
+```
+Another option that can be used for english only tasks, but is likely the most effective combination of small models:
+
+```bash
+whisper-subtitles /path/to/audiofile --model_id openai/whisper-medium.en --max_new_tokens 512 --chunk_length_s 20 --batch_size 16 --assistant_model_id distil-whisper/distil-medium.en
+```
 
 ## Utility Features
 
-Easily verify that youre GPU can be utilized properly.
+Easily verify that your GPU can be utilized properly.
 
 ![GPU-stats](files/gpu_information.png)
 

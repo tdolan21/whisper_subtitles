@@ -1,4 +1,4 @@
-from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
+from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline, AutoModelForCausalLM
 from pyannote.audio.pipelines.utils.hook import ProgressHook
 from moviepy.editor import VideoFileClip
 from whisper_subtitles.utils import check_gpu_availability
@@ -76,11 +76,12 @@ def parse_arguments():
     parser.add_argument('--model_id', type=str, default="openai/whisper-large-v3", help='Whisper model ID (default: openai/whisper-large-v3)')
     parser.add_argument('--info', action='store_true', help='Display information about models and GPU')
     parser.add_argument('--gpu', action='store_true', help='Check if GPU is available')
+    parser.add_argument('--assistant_model_id', type=str, default=None, help='Assistant model ID for speculative decoding (default: None)')
     
     return parser.parse_args()
 
 
-def load_whisper_model(model_id, torch_dtype, max_new_tokens, chunk_length_s, batch_size):
+def load_whisper_model(model_id, torch_dtype, max_new_tokens, chunk_length_s, batch_size, assistant_model_id=None):
     device = torch.device("cuda")
     torch_dtype = torch.float16
 
@@ -89,20 +90,31 @@ def load_whisper_model(model_id, torch_dtype, max_new_tokens, chunk_length_s, ba
     ).to(device)
     
     console.print(f"[bold cyan] Whisper device after moving: [/bold cyan][bold green]{whisper_model.device}[/bold green]")
-    #whisper_model.to_bettertransformer()
     whisper_processor = AutoProcessor.from_pretrained(model_id)
+
+    # Initialize generate_kwargs for pipeline
+    generate_kwargs = {"max_new_tokens": max_new_tokens}
+
+    # If assistant_model_id is provided, load the assistant model and add it to generate_kwargs
+    if assistant_model_id:
+        assistant_model = AutoModelForCausalLM.from_pretrained(
+            assistant_model_id, torch_dtype=torch_dtype, low_cpu_mem_usage=True, use_safetensors=True
+        ).to(device)
+
+        # Add assistant_model to generate_kwargs
+        generate_kwargs["assistant_model"] = assistant_model
 
     whisper_pipe = pipeline(
         "automatic-speech-recognition",
         model=whisper_model,
         tokenizer=whisper_processor.tokenizer,
         feature_extractor=whisper_processor.feature_extractor,
-        max_new_tokens=max_new_tokens,
         chunk_length_s=chunk_length_s,
         batch_size=batch_size,
         return_timestamps=True,
         torch_dtype=torch_dtype,
         device=device,
+        generate_kwargs=generate_kwargs
     )
     return whisper_pipe
 
